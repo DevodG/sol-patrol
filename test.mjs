@@ -6,8 +6,8 @@ import assert from "node:assert";
 const src = fs.readFileSync(new URL("./data.js", import.meta.url), "utf8");
 const ctx = {};
 vm.createContext(ctx);
-vm.runInContext(src + "\n;globalThis.__d = { ACTIONS, EVENTS, ARCHIVE_FLARES, RANKS, FACTS, DILEMMAS };", ctx);
-const { ACTIONS, EVENTS, ARCHIVE_FLARES, RANKS, FACTS, DILEMMAS } = ctx.__d;
+vm.runInContext(src + "\n;globalThis.__d = { ACTIONS, EVENTS, ARCHIVE_FLARES, RANKS, FACTS, DILEMMAS, PLANETS, MOON_EVENTS };", ctx);
+const { ACTIONS, EVENTS, ARCHIVE_FLARES, RANKS, FACTS, DILEMMAS, PLANETS, MOON_EVENTS } = ctx.__d;
 
 // No free/safe choice: every mission card must cost Power.
 assert.ok(ACTIONS.length >= 5, "need at least 5 mission cards");
@@ -50,5 +50,13 @@ for (const id of ["mod-habitat", "mod-green", "mod-dish", "mod-solar", "rover", 
   assert.ok(html.includes(`id="${id}"`), `index.html missing interactive element #${id}`);
 }
 assert.ok(gameSrc.includes("wireScene") && gameSrc.includes("chooseDilemma"), "scene clicks + dilemma must be wired in game.js");
+
+// Planet contracts: Mars + Moon both playable, Moon delay is seconds not minutes.
+assert.ok(PLANETS.mars && PLANETS.moon, "both Mars and Moon must exist");
+assert.ok(PLANETS.moon.delay.includes("second"), "Moon comms delay must be seconds");
+assert.ok(PLANETS.mars.delay.includes("minutes"), "Mars comms delay must be minutes");
+assert.ok(Object.keys(MOON_EVENTS).length >= 4, "Moon needs its own event facts");
+assert.ok(html.includes('id="pickMoon"') && html.includes('id="earthView"'), "title needs Moon picker + Earth view");
+assert.ok(gameSrc.includes("applyPlanet") && gameSrc.includes("planetEvent"), "planet switching must be wired");
 
 console.log("test.mjs: all checks passed");

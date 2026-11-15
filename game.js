@@ -26,7 +26,9 @@ const state = {
   solarTomorrow: null, grewToday: false, restedToday: false,
   over: false, sound: true, sunRisk: "active", started: false,
   dilemmaIdx: 0, dilemmaDone: false,
+  planet: "mars",
 };
+const P = () => PLANETS[state.planet] || PLANETS.mars;
 
 const SAVE_KEY = "sol-patrol-save-v1";
 function saveGame() {
@@ -37,7 +39,7 @@ function saveGame() {
       stars: state.stars, shieldOn: state.shieldOn, used: [...state.used],
       deck: state.deck.map((e) => e.id), tonight: state.tonight ? state.tonight.id : null,
       solarTomorrow: state.solarTomorrow, grewToday: state.grewToday, restedToday: state.restedToday, sunRisk: state.sunRisk,
-      dilemmaIdx: state.dilemmaIdx, dilemmaDone: state.dilemmaDone,
+      dilemmaIdx: state.dilemmaIdx, dilemmaDone: state.dilemmaDone, planet: state.planet,
     }));
     $("saveWarn").classList.add("hidden");
   } catch (e) {
@@ -55,15 +57,16 @@ function restoreSave(s) {
     shieldOn: !!s.shieldOn, used: new Set(s.used || []), deck: (s.deck || []).map(byId).filter(Boolean),
     tonight: s.tonight ? byId(s.tonight) : null, solarTomorrow: s.solarTomorrow != null ? s.solarTomorrow : null,
     grewToday: !!s.grewToday, restedToday: !!s.restedToday, sunRisk: s.sunRisk || "active", over: false, started: true,
-    dilemmaIdx: s.dilemmaIdx || 0, dilemmaDone: !!s.dilemmaDone,
+    dilemmaIdx: s.dilemmaIdx || 0, dilemmaDone: !!s.dilemmaDone, planet: PLANETS[s.planet] ? s.planet : "mars",
   });
+  applyPlanet();
   showDilemma();
   if (!state.tonight) pickTonight(); else $("forecast").textContent = "Tonight: " + state.tonight.forecast;
-  $("phaseTitle").textContent = `Sol ${state.sol} — Your turn, Commander!`;
-  $("sceneCaption").textContent = `Welcome back, Commander! Sol ${state.sol} on Mars.`;
+  $("phaseTitle").textContent = `${P().day} ${state.sol} — Your turn, Commander!`;
+  $("sceneCaption").textContent = `Welcome back, Commander! ${P().day} ${state.sol} on the ${P().name}.`;
   $("nightShade").classList.add("hidden");
   $("nightBtn").disabled = !state.dilemmaDone;
-  logMsg(`Mission restored at Sol ${state.sol}. Your crew waited for you!`);
+  logMsg(`Mission restored at ${P().day} ${state.sol}. Your crew waited for you!`);
   render();
 }
 
@@ -92,8 +95,31 @@ function floatText(anchor, text) {
   } catch (e) { /* decoration only */ }
 }
 
+function planetEvent(ev) {
+  if (state.planet === "moon" && MOON_EVENTS[ev.id]) return { ...ev, title: MOON_EVENTS[ev.id].title, fact: MOON_EVENTS[ev.id].fact };
+  return ev;
+}
+
+function applyPlanet() {
+  const p = P();
+  $("scene").classList.toggle("moon", state.planet === "moon");
+  $("earthView").classList.toggle("hidden", state.planet !== "moon");
+  $("pickMars").classList.toggle("picked", state.planet === "mars");
+  $("pickMoon").classList.toggle("picked", state.planet === "moon");
+  $("planetNote").textContent = state.planet === "mars"
+    ? "Mars: messages home take ~12 minutes. Dust storms block sunshine!"
+    : "Moon: messages home take ~1 second — almost live! Ice hides at the South Pole.";
+  $("ruleWin").textContent = `3. Survive 8 ${p.days} & earn Science Stars`;
+  const callCard = document.querySelector('[data-id="call"] .action-desc');
+  if (callCard) callCard.textContent = p.callDesc;
+  const foodCard = document.querySelector('[data-id="food"] .action-desc');
+  if (foodCard) foodCard.textContent = state.planet === "moon" ? "Water the Moon garden." : "Water the Mars garden.";
+  const sciCard = document.querySelector('[data-id="science"] .action-desc');
+  if (sciCard) sciCard.textContent = state.planet === "moon" ? "Collect Moon rocks. Uses extra air. Costs more Power each time!" : "Collect Mars rocks. Uses extra air. Costs more Power each time!";
+}
+
 function render() {
-  $("solPill").textContent = `Sol ${Math.min(state.sol, state.maxSol)} of ${state.maxSol}`;
+  $("solPill").textContent = `${P().day} ${Math.min(state.sol, state.maxSol)} of ${state.maxSol}`;
   $("starPill").textContent = `Science Stars: ${state.stars}`;
   $("powerVal").textContent = state.power;
   $("airVal").textContent = state.air;
@@ -175,7 +201,7 @@ function crewSay() {
   else if (state.food <= 24) say("Pip: My tummy is rumbling… tap the green garden dome to grow food!");
   else if (state.health <= 40) say("Nova: We feel tired. Rest or Call Earth would help us a lot.");
   else if (state.shieldOn) say("Pip: Shields up! I feel safe tonight, Commander.");
-  else say(state.sol % 2 ? "Nova: What is our plan today, Commander?" : "Pip: I love Mars! What should we run first?");
+  else say(state.sol % 2 ? "Nova: What is our plan today, Commander?" : "Pip: I love it here! What should we run first?");
 }
 
 function showDilemma() {
@@ -246,13 +272,13 @@ function morning() {
   state.dilemmaIdx = state.sol - 1; state.dilemmaDone = false;
   showDilemma();
   pickTonight();
-  $("phaseTitle").textContent = `Sol ${state.sol} — Your turn, Commander!`;
+  $("phaseTitle").textContent = `${P().day} ${state.sol} — Your turn, Commander!`;
   $("phaseHint").textContent = "Tap cards to run your base. Watch your Power — you cannot do everything!";
-  $("sceneCaption").textContent = `Morning of Sol ${state.sol}. Sunshine made ${solar} Power!`;
+  $("sceneCaption").textContent = `Morning of ${P().day} ${state.sol} at ${P().place}. Sunshine made ${solar} Power!`;
   $("powerNote").textContent = `Solar panels made ${solar} Power. Leftover power saved: ${banked} (batteries hold only 5).`;
   $("nightShade").classList.add("hidden");
   $("nightBtn").disabled = !state.dilemmaDone;
-  logMsg(`Sol ${state.sol} morning: +${solar} Power from sunshine.`);
+  logMsg(`${P().day} ${state.sol} morning: +${solar} Power from sunshine.`);
   render();
   crewSay();
 }
@@ -262,7 +288,7 @@ function resolveNight() {
   $("nightBtn").disabled = true;
   document.querySelectorAll(".action-card").forEach((c) => (c.disabled = true));
   $("nightShade").classList.remove("hidden");
-  $("sceneCaption").textContent = "Night falls on Mars…";
+  $("sceneCaption").textContent = `Night falls on the ${P().name}…`;
   beep(300, 0.3);
   const ev = state.tonight;
   let text = "";
@@ -281,12 +307,12 @@ function resolveNight() {
   } else if (ev.id === "air-leak") {
     state.air = clamp(state.air - 14); text += "A tiny leak let air escape (−14 Air). The crew patched it with tape and teamwork!";
   } else if (ev.id === "quiet-night") {
-    state.health = clamp(state.health + 4); text += "Everyone slept under bright Mars stars (+4 Health).";
+    state.health = clamp(state.health + 4); text += `Everyone slept under a bright starry sky (+4 Health).`;;
   } else if (ev.id === "garden-pests") {
     if (state.grewToday) { state.food = clamp(state.food - 4); text += "Bugs nibbled the garden, but you grew food today so you only lost a little (−4 Food)."; }
     else { state.food = clamp(state.food - 13); text += "Bugs ate stored food (−13 Food). Growing fresh food helps protect you!"; }
   } else if (ev.id === "rover-ice") {
-    state.air = clamp(state.air + 10); text += "The rover melted underground ice into water, and the base made extra air (+10 Air). Ice is treasure on Mars!";
+    state.air = clamp(state.air + 10); text += `The rover melted underground ice into water, and the base made extra air (+10 Air). Ice is treasure on the ${P().name}!`;
   } else if (ev.id === "homesick") {
     if (state.restedToday) { state.health = clamp(state.health - 2); text += "The crew missed home, but rest today helped (−2 Health only)."; }
     else { state.health = clamp(state.health - 10); text += "The crew felt homesick and tired (−10 Health). Rest and calls home really help!"; }
@@ -296,9 +322,9 @@ function resolveNight() {
   }
   text += ` Air left: ${state.air} — about ${Math.floor(state.air / 14)} nights of breathing left. Food left: ${state.food}.`;
   render();
-  $("eventTitle").textContent = ev.title;
+  $("eventTitle").textContent = planetEvent(ev).title;
   $("eventText").textContent = text;
-  $("eventFact").textContent = "Real science: " + ev.fact;
+  $("eventFact").textContent = "Real science: " + planetEvent(ev).fact;
   $("eventCard").classList.remove("hidden");
   $("eventBtn").focus();
 }
@@ -318,14 +344,14 @@ function endGame(won, reason) {
   $("endScreen").classList.remove("hidden");
   if (won) {
     const rank = RANKS.find((r) => state.stars >= r.min);
-    $("endTitle").textContent = "SOL PATROL — Mission Complete, You Survived Mars!";
+    $("endTitle").textContent = `SOL PATROL — Mission Complete, ${P().survive}`;
     $("endRank").textContent = `${rank.title} · ${state.stars} Science Stars · Spend the sunshine. Survive the night.`;
     $("endMsg").textContent = rank.msg;
-    $("endLessons").innerHTML = "<strong>What you learned:</strong><br>1. Power is limited — every choice costs something.<br>2. Shields protect crews from invisible radiation.<br>3. Messages to Mars take minutes, so crews must solve problems alone.<br>4. Growing food uses air and water too. Everything is connected!";
+    $("endLessons").innerHTML = "<strong>What you learned:</strong><br>1. Power is limited — every choice costs something.<br>2. Shields protect crews from invisible radiation.<br>3. Messages home can take minutes (Mars) or seconds (Moon) — distance matters.<br>4. Growing food uses air and water too. Everything is connected!";
     beep(660, 0.3); setTimeout(() => beep(880, 0.4), 220);
   } else {
     $("endTitle").textContent = "Rescue Mission Launched!";
-    $("endRank").textContent = `Your ${reason} ran out on Sol ${state.sol}`;
+    $("endRank").textContent = `Your ${reason} ran out on ${P().day} ${state.sol}`;
     $("endMsg").textContent = "Do not worry — real commanders learn from every mission. NASA is sending supplies, and your crew is safe. Look at what ran low, try a new plan, and fly again!";
     $("endLessons").innerHTML = `<strong>Commander's tip:</strong> watch the <strong>${reason}</strong> meter. Do the matching mission card earlier next time, and check tonight's forecast before you spend all your Power.`;
     beep(220, 0.4);
@@ -338,7 +364,7 @@ function resetGame() {
   $("log").innerHTML = "";
   $("endScreen").classList.add("hidden");
   $("eventCard").classList.add("hidden");
-  logMsg("Welcome, Commander of your Sol Patrol — Nova and Pip are counting on you! Survive 8 sols on Mars.");
+  logMsg(`Welcome, Commander of your Sol Patrol — Nova and Pip are counting on you! Survive 8 ${P().days} on the ${P().name}.`);
   morning();
 }
 
@@ -399,11 +425,14 @@ async function loadSunData() {
 function wire() {
   buildActions();
   wireScene();
+$("pickMars").addEventListener("click", () => { state.planet = "mars"; applyPlanet(); beep(600, 0.15); });
+  $("pickMoon").addEventListener("click", () => { state.planet = "moon"; applyPlanet(); beep(700, 0.15); });
+  applyPlanet();
   $("dilemmaA").addEventListener("click", () => chooseDilemma("a"));
   $("dilemmaB").addEventListener("click", () => chooseDilemma("b"));
   const existing = readSave();
   if (existing) {
-    $("startBtn").textContent = `Continue Sol ${existing.sol}`;
+    $("startBtn").textContent = `Continue ${PLANETS[existing.planet] ? PLANETS[existing.planet].day : "Sol"} ${existing.sol}`;
     $("freshBtn").classList.remove("hidden");
   }
   $("startBtn").addEventListener("click", () => {

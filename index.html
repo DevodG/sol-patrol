@@ -29,10 +29,15 @@
     <p class="tagline-sub">A sol is a Mars day, and the Sun is your battery. A Mars outpost game for ages 7–12, powered by live NASA DONKI space weather. Your crew: Nova and Pip.</p>
     <img class="title-art" src="assets/mars-outpost.jpg" alt="Painting of a friendly Mars base with habitat dome, greenhouse, solar panels, rover and two astronauts" width="1120" height="747" fetchpriority="high">
     <p class="pitch">You are the Commander of a Mars base. Keep your crew breathing, fed and safe for <strong>8 sols</strong> (Mars days). Every choice costs power — choose like a real NASA commander!</p>
+    <div class="planet-pick" role="group" aria-label="Pick your destination">
+      <button id="pickMars" class="planet-btn picked" type="button">Mars — Jezero Plains</button>
+      <button id="pickMoon" class="planet-btn" type="button">Moon — Shackleton Crater</button>
+    </div>
+    <p id="planetNote" class="planet-note">Mars: messages home take ~12 minutes. Dust storms block sunshine!</p>
     <div class="title-rules">
       <span>1. Spend sunshine power each day</span>
       <span>2. Get ready for tonight</span>
-      <span>3. Survive 8 sols &amp; earn Science Stars</span>
+      <span id="ruleWin">3. Survive 8 sols &amp; earn Science Stars</span>
     </div>
     <button id="startBtn" class="big-btn">Start Mission</button>
     <button id="freshBtn" class="soft-btn hidden">New Mission</button>
@@ -127,6 +132,7 @@
         <g id="rover"><ellipse cx="583" cy="306" rx="52" ry="8" fill="#7a2c12" opacity=".35"/><rect x="540" y="262" width="86" height="38" rx="16" fill="url(#domeG)" stroke="#26324a" stroke-width="3"/><circle cx="560" cy="302" r="11" fill="#4a4a5a"/><circle cx="590" cy="304" r="11" fill="#4a4a5a"/><circle cx="618" cy="302" r="11" fill="#4a4a5a"/><rect x="578" y="244" width="10" height="20" fill="#7a4a2b"/><circle cx="583" cy="240" r="9" fill="#8fd0e8" stroke="#26324a" stroke-width="2"/></g>
         <g id="crew1"><ellipse cx="330" cy="326" rx="18" ry="5" fill="#7a2c12" opacity=".4"/><circle cx="330" cy="278" r="17" fill="#fff" stroke="#26324a" stroke-width="3"/><circle cx="330" cy="278" r="10" fill="#f2b879"/><rect x="314" y="294" width="32" height="30" rx="10" fill="#fff" stroke="#26324a" stroke-width="3"/><rect x="306" y="298" width="9" height="19" rx="4" fill="#e4572e"/><circle cx="330" cy="306" r="5" fill="#ffb703"/></g>
         <g id="crew2"><ellipse cx="376" cy="328" rx="18" ry="5" fill="#7a2c12" opacity=".4"/><circle cx="376" cy="281" r="17" fill="#fff" stroke="#26324a" stroke-width="3"/><circle cx="376" cy="281" r="10" fill="#8a5a3b"/><rect x="360" y="297" width="32" height="30" rx="10" fill="#fff" stroke="#26324a" stroke-width="3"/><rect x="390" y="301" width="9" height="19" rx="4" fill="#2a9d8f"/><circle cx="376" cy="309" r="5" fill="#3aa6c9"/></g>
+        <g id="earthView" class="hidden"><circle cx="90" cy="48" r="20" fill="#7ec3ee"/><path d="M76 40 q10-8 22-2 M78 54 q12 8 24 0" stroke="#3e9e5f" stroke-width="5" fill="none"/></g>
         <g id="shieldDome" class="shield-dome hidden"><path d="M70 275 a300 190 0 0 1 600 0" fill="none" stroke="#57c7e3" stroke-width="5" stroke-dasharray="12 10" opacity="0.9"/></g>
       </svg>
       <div id="nightShade" class="night-shade hidden"></div>

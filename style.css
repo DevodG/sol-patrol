@@ -49,6 +49,12 @@ button:focus-visible{outline:4px solid #3aa6c9;outline-offset:3px}
 .dilemma-btn:disabled{opacity:.55}
 .dilemma-btn small{display:block;font-weight:800}
 .dilemma-done{color:#173a52}
+.planet-pick{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.planet-btn{flex:1;min-width:200px;background:#fff;border:3px solid var(--ink);border-radius:14px;padding:11px;font-weight:900}
+.planet-btn.picked{background:#ffe9a8}
+.planet-note{font-weight:900;background:#eaf4fb;border-radius:12px;padding:8px 11px}
+.scene.moon .scene-svg{filter:saturate(.3) hue-rotate(180deg) brightness(1.05)}
+.scene.moon .night-shade{background:rgba(10,14,40,.6)}
 .night-shade{position:absolute;inset:0;background:rgba(20,28,64,.55)}
 .scene-caption{position:absolute;left:12px;bottom:12px;background:#fff;border:3px solid var(--ink);border-radius:14px;padding:7px 12px;font-weight:900;max-width:88%}
 .shield-dome.hidden{display:none}

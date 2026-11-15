@@ -110,6 +110,30 @@ const FACTS = [
   "The space station recycles about 90% of its water — even sweat and breath become drinking water.",
 ];
 
+const PLANETS = {
+  mars: {
+    name: "Mars", place: "Jezero Plains", day: "Sol", days: "sols",
+    delay: "about 12 minutes", delayFact: "Mars is so far that messages take 3 to 22 minutes to reach Earth. There is no live chat with Mars!",
+    callDesc: "Video chat with family. It takes ~12 minutes to arrive!",
+    survive: "You Survived Mars!",
+  },
+  moon: {
+    name: "Moon", place: "Shackleton Crater, South Pole", day: "Moon Day", days: "Moon days",
+    delay: "about 1 second — almost live", delayFact: "The Moon is close! Messages take only about 1.3 seconds to reach Earth — almost live, unlike Mars.",
+    callDesc: "Video chat with family. It takes ~1 second — almost live!",
+    survive: "You Survived the Moon!",
+  },
+};
+
+// Moon versions of event facts/titles (same mechanics, Moon science).
+const MOON_EVENTS = {
+  "dust-storm": { title: "Lunar Dust Trouble!", fact: "Moon dust is sharp like tiny glass and sticks to everything! Apollo astronauts said it smelled like gunpowder and wore down their suits." },
+  "rover-ice": { title: "Rover Found Ice!", fact: "The Moon's South Pole has real water ice hiding in dark, freezing craters — like Shackleton Crater, where your base sits!" },
+  "quiet-night": { title: "Quiet Earthlit Night", fact: "From the Moon, Earth hangs in a black sky and never sets at your South Pole base. A Moon day lasts about 29 Earth days, so your base uses mission days!" },
+  "cold-night": { title: "Super Cold Night!", fact: "Moon nights can drop to −170°C! Heaters use lots of power, so cold nights test the whole base." },
+  "meteor": { title: "Tiny Space Rock!", fact: "The Moon has almost no sky (atmosphere), so space rocks smash straight into the ground — that is why the Moon has so many craters!" },
+};
+
 // Daily Dilemma: pick ONE. You cannot have both — that is the trade-off.
 const DILEMMAS = [
   { q: "Nova found spare water. Where should it go?", a: { label: "Water the garden", effects: { food: +10, air: -5 }, text: "+10 Food, −5 Air" }, b: { label: "Make extra air", effects: { air: +10, food: -5 }, text: "+10 Air, −5 Food" } },

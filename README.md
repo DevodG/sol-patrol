@@ -7,7 +7,7 @@ Live play: *(paste your deployed URL here)* · Deploy root = this folder (`junio
 
 NASA Space Apps Challenge 2026 · *Build a Junior Astronaut Mission Trainer* · For kids ages 7–12. Minimum browser: Chrome/Safari 14+.
 
-You command a Mars outpost in Jezero Plains for **8 sols**. Each morning sunshine gives you limited **Power**. Spend it on mission cards — Make Air, Grow Food, Raise Shields, Do Science, Call Earth, Rest & Fix — then face the night: your crew breathes and eats, and an event (solar storm, dust storm, freezing night, air leak…) tests your choices. Every card costs Power, so no choice is free — exactly like real NASA mission planning. Survive all 8 sols and earn Science Stars for your rank.
+You command an outpost for **8 days** — pick **Mars (Jezero Plains)** or **the Moon (Shackleton Crater, South Pole)** on the title screen. Each world has its own science: Mars messages take ~12 minutes and dust storms block sunshine; Moon messages take ~1 second and ice hides in dark polar craters. Each morning sunshine gives you limited **Power**. Spend it on mission cards — Make Air, Grow Food, Raise Shields, Do Science, Call Earth, Rest & Fix — then face the night: your crew breathes and eats, and an event (solar storm, dust storm, freezing night, air leak…) tests your choices. Every card costs Power, so no choice is free — exactly like real NASA mission planning. Survive all 8 sols and earn Science Stars for your rank.
 
 ## Run it
 
