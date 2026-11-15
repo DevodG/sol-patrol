@@ -31,6 +31,10 @@ const state = {
 const P = () => PLANETS[state.planet] || PLANETS.mars;
 
 const SAVE_KEY = "sol-patrol-save-v1";
+const HI_KEY = "sol-patrol-hiscore";
+function getHiScore() { try { return Number(localStorage.getItem(HI_KEY)) || 0; } catch (e) { return 0; } }
+function setHiScore(s) { try { localStorage.setItem(HI_KEY, String(s)); } catch (e) { /* optional */ } }
+function renderHiScore() { const el = $("hiScore"); if (el) el.textContent = getHiScore(); }
 function saveGame() {
   if (!state.started || state.over) return;
   try {
@@ -110,6 +114,13 @@ function applyPlanet() {
     ? "Mars: messages home take ~12 minutes. Dust storms block sunshine!"
     : "Moon: messages home take ~1 second — almost live! Ice hides at the South Pole.";
   $("ruleWin").textContent = `3. Survive 8 ${p.days} & earn Science Stars`;
+  const art = $("titleArt");
+  if (art) {
+    art.src = state.planet === "moon" ? "assets/moon-outpost.jpg" : "assets/mars-outpost.jpg";
+    art.alt = state.planet === "moon"
+      ? "Painting of a friendly Moon base at Shackleton Crater with habitat dome, greenhouse, solar panels, rover and two astronauts, Earth in the sky"
+      : "Painting of a friendly Mars base with habitat dome, greenhouse, solar panels, rover and two astronauts";
+  }
   const callCard = document.querySelector('[data-id="call"] .action-desc');
   if (callCard) callCard.textContent = p.callDesc;
   const foodCard = document.querySelector('[data-id="food"] .action-desc');
@@ -150,8 +161,22 @@ function render() {
   $("airNote").textContent = state.air <= 42 ? `Careful! Air runs out in about ${proj(state.air, 14)} nights if you do nothing.` : "";
   $("foodNote").textContent = state.food <= 36 ? `Careful! Food runs out in about ${proj(state.food, 12)} nights if you do nothing.` : "";
   for (const [bar, v] of [["powerBar", clamp(state.power * 3)], ["airBar", state.air], ["foodBar", state.food], ["healthBar", state.health]]) $(bar).parentElement.setAttribute("aria-valuenow", v);
+  renderSolDots();
   saveGame();
 }
+
+function renderSolDots() {
+  const wrap = $("solDots");
+  if (!wrap) return;
+  wrap.innerHTML = "";
+  for (let i = 1; i <= state.maxSol; i++) {
+    const dot = document.createElement("span");
+    dot.className = "sol-dot" + (i < state.sol ? " done" : i === state.sol ? " current" : "");
+    wrap.appendChild(dot);
+  }
+}
+
+const ACTION_ICONS = { air: "💨", food: "🌱", shield: "🛡️", science: "🔬", call: "📡", rest: "😴" };
 
 function buildActions() {
   const wrap = $("actions");
@@ -160,7 +185,8 @@ function buildActions() {
     const b = document.createElement("button");
     b.className = "action-card"; b.dataset.id = a.id;
     b.setAttribute("aria-label", `${a.name}. Costs ${a.power} power. ${a.effectText}`);
-    b.innerHTML = `<span class="action-top"><span class="action-name">${a.name}</span><span class="cost">${a.power} Power</span></span>
+    const icon = ACTION_ICONS[a.id] || "🚀";
+    b.innerHTML = `<span class="action-top"><span class="action-icon">${icon}</span><span class="action-name">${a.name}</span><span class="cost">${a.power} Power</span></span>
       <span class="action-desc" style="display:block">${a.desc}</span>
       <span class="action-effect" style="display:block">${a.effectText}</span>
       <span class="action-fact">${a.fact}</span>`;
@@ -213,7 +239,7 @@ function showDilemma() {
   $("dilemmaB").disabled = state.dilemmaDone || state.over;
   $("dilemmaDone").classList.toggle("hidden", !state.dilemmaDone);
   $("nightBtn").disabled = !state.dilemmaDone || state.over;
-  $("nightBtn").textContent = state.dilemmaDone ? "Start Night" : "Pick a Dilemma first, then Start Night";
+  $("nightBtn").textContent = state.dilemmaDone ? "🌙 Start Night" : "Pick a Dilemma first, then Start Night";
 }
 
 function chooseDilemma(which) {
@@ -281,6 +307,11 @@ function morning() {
   logMsg(`${P().day} ${state.sol} morning: +${solar} Power from sunshine.`);
   render();
   crewSay();
+  // Sol 1 tutorial hint — pulse the first action card for new players
+  if (state.sol === 1) {
+    const first = document.querySelector(".action-card");
+    if (first) { first.classList.add("hint-pulse"); first.addEventListener("click", () => first.classList.remove("hint-pulse"), { once: true }); }
+  }
 }
 
 function resolveNight() {
@@ -307,7 +338,7 @@ function resolveNight() {
   } else if (ev.id === "air-leak") {
     state.air = clamp(state.air - 14); text += "A tiny leak let air escape (−14 Air). The crew patched it with tape and teamwork!";
   } else if (ev.id === "quiet-night") {
-    state.health = clamp(state.health + 4); text += `Everyone slept under a bright starry sky (+4 Health).`;;
+    state.health = clamp(state.health + 4); text += `Everyone slept under a bright starry sky (+4 Health).`;
   } else if (ev.id === "garden-pests") {
     if (state.grewToday) { state.food = clamp(state.food - 4); text += "Bugs nibbled the garden, but you grew food today so you only lost a little (−4 Food)."; }
     else { state.food = clamp(state.food - 13); text += "Bugs ate stored food (−13 Food). Growing fresh food helps protect you!"; }
@@ -340,6 +371,8 @@ function checkEnd() {
 function endGame(won, reason) {
   state.over = true;
   clearSave();
+  if (won && state.stars > getHiScore()) setHiScore(state.stars);
+  renderHiScore();
   render();
   $("endScreen").classList.remove("hidden");
   if (won) {
@@ -348,12 +381,15 @@ function endGame(won, reason) {
     $("endRank").textContent = `${rank.title} · ${state.stars} Science Stars · Spend the sunshine. Survive the night.`;
     $("endMsg").textContent = rank.msg;
     $("endLessons").innerHTML = "<strong>What you learned:</strong><br>1. Power is limited — every choice costs something.<br>2. Shields protect crews from invisible radiation.<br>3. Messages home can take minutes (Mars) or seconds (Moon) — distance matters.<br>4. Growing food uses air and water too. Everything is connected!";
+    $("shareBtn").classList.remove("hidden");
+    $("shareBtn").dataset.text = `I survived 8 ${P().days} on the ${P().name} with ${state.stars} Science Stars! 🚀 Play SOL PATROL — Spend the sunshine. Survive the night.`;
     beep(660, 0.3); setTimeout(() => beep(880, 0.4), 220);
   } else {
     $("endTitle").textContent = "Rescue Mission Launched!";
     $("endRank").textContent = `Your ${reason} ran out on ${P().day} ${state.sol}`;
     $("endMsg").textContent = "Do not worry — real commanders learn from every mission. NASA is sending supplies, and your crew is safe. Look at what ran low, try a new plan, and fly again!";
     $("endLessons").innerHTML = `<strong>Commander's tip:</strong> watch the <strong>${reason}</strong> meter. Do the matching mission card earlier next time, and check tonight's forecast before you spend all your Power.`;
+    $("shareBtn").classList.add("hidden");
     beep(220, 0.4);
   }
   $("againBtn").focus();
@@ -425,6 +461,7 @@ async function loadSunData() {
 function wire() {
   buildActions();
   wireScene();
+  renderHiScore();
 $("pickMars").addEventListener("click", () => { state.planet = "mars"; applyPlanet(); beep(600, 0.15); });
   $("pickMoon").addEventListener("click", () => { state.planet = "moon"; applyPlanet(); beep(700, 0.15); });
   applyPlanet();
@@ -492,6 +529,11 @@ $("pickMars").addEventListener("click", () => { state.planet = "mars"; applyPlan
         return;
       }
     }
+  });
+  $("shareBtn").addEventListener("click", async () => {
+    const text = $("shareBtn").dataset.text || "Play SOL PATROL!";
+    try { await navigator.clipboard.writeText(text); $("shareBtn").textContent = "Copied! 🎉"; setTimeout(() => { $("shareBtn").textContent = "Share Your Rank 🚀"; }, 2000); }
+    catch (e) { $("shareBtn").textContent = "Could not copy"; setTimeout(() => { $("shareBtn").textContent = "Share Your Rank 🚀"; }, 2000); }
   });
   render();
   loadSunData();
