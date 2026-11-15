@@ -3,7 +3,7 @@
 **Spend the sunshine. Survive the night.**
 
 ▶ Demo (30s): *(record and paste your unlisted video URL here before submitting — script below)*
-Live play: *(paste your deployed URL here)* · Deploy root = this folder (`junior-astronaut-trainer/`)
+Live play: https://devodg.github.io/sol-patrol/ · Deployed via GitHub Pages
 
 NASA Space Apps Challenge 2026 · *Build a Junior Astronaut Mission Trainer* · For kids ages 7–12. Minimum browser: Chrome/Safari 14+.
 
@@ -11,11 +11,14 @@ You command an outpost for **8 days** — pick **Mars (Jezero Plains)** or **the
 
 ## Run it
 
-```
-cd junior-astronaut-trainer && npm start
+Play directly in your browser: **https://devodg.github.io/sol-patrol/**
+
+To run locally:
+```bash
+npm start
 ```
 
-Then open http://127.0.0.1:8765/ in a browser. Alternatives: `python3 -m http.server 8765` (Windows: `py -m http.server 8765`), or double-click `index.html`. Any static host works (submit/deploy this folder); there is no build step and no account. Optional: add `?key=YOUR_NASA_KEY` to the URL to use your own free api.nasa.gov key instead of the shared DEMO_KEY; the game caches a live Sun answer for 6 hours.
+Then open http://127.0.0.1:8765/ in a browser. Alternatives: `python3 -m http.server 8765` (Windows: `py -m http.server 8765`), or double-click `index.html`. Any static host works; there is no build step and no account. Optional: add `?key=YOUR_NASA_KEY` to the URL to use your own free api.nasa.gov key instead of the shared DEMO_KEY; the game caches a live Sun answer for 6 hours.
 
 ## How it teaches real trade-offs
 
