@@ -110,6 +110,16 @@ const FACTS = [
   "The space station recycles about 90% of its water — even sweat and breath become drinking water.",
 ];
 
+// Daily Dilemma: pick ONE. You cannot have both — that is the trade-off.
+const DILEMMAS = [
+  { q: "Nova found spare water. Where should it go?", a: { label: "Water the garden", effects: { food: +10, air: -5 }, text: "+10 Food, −5 Air" }, b: { label: "Make extra air", effects: { air: +10, food: -5 }, text: "+10 Air, −5 Food" } },
+  { q: "The rover can make ONE trip today. Where should Pip send it?", a: { label: "Fetch underground ice", effects: { air: +8, food: -4 }, text: "+8 Air, −4 Food for the trip snacks" }, b: { label: "Collect shiny rocks", effects: { health: +6, air: -4 }, text: "+6 Crew Health (happy crew!), −4 Air" } },
+  { q: "Movie night or early bedtime for the crew?", a: { label: "Movie night!", effects: { health: +9, food: -6 }, text: "+9 Crew Health, −6 Food for popcorn" }, b: { label: "Early bedtime", effects: { air: +6, health: -3 }, text: "+6 Air saved, −3 Crew Health (grumpy!)" } },
+  { q: "Sunshine is strong at lunch. Use the spare Power hour for…", a: { label: "Charge shields a little", effects: { health: +5, food: -4 }, text: "+5 Crew Health (crew feels safer), −4 Food" }, b: { label: "Grow a bonus salad", effects: { food: +9, air: -5 }, text: "+9 Food, −5 Air" } },
+  { q: "A supply drone can drop ONE crate. Pick wisely, Commander!", a: { label: "Air tanks crate", effects: { air: +11, food: -3 }, text: "+11 Air, −3 Food (drone fee!)" }, b: { label: "Snack crate", effects: { food: +11, air: -3 }, text: "+11 Food, −3 Air (drone fee!)" } },
+  { q: "Fix the squeaky air fan now, or let the crew rest?", a: { label: "Fix it together", effects: { air: +9, health: -4 }, text: "+9 Air, −4 Crew Health (tired crew)" }, b: { label: "Let them rest", effects: { health: +8, air: -5 }, text: "+8 Crew Health, −5 Air (fan wastes air)" } },
+];
+
 const RANKS = [
   { min: 3, title: "Sol Patrol Commander", msg: "Wow! You kept everyone safe AND did amazing science. NASA would hire you today!" },
   { min: 1, title: "Outpost Explorer", msg: "Great commanding! Your crew is safe and you discovered lots of Mars secrets." },

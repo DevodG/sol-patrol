@@ -130,7 +130,8 @@
         <g id="shieldDome" class="shield-dome hidden"><path d="M70 275 a300 190 0 0 1 600 0" fill="none" stroke="#57c7e3" stroke-width="5" stroke-dasharray="12 10" opacity="0.9"/></g>
       </svg>
       <div id="nightShade" class="night-shade hidden"></div>
-      <div id="sceneCaption" class="scene-caption">Morning on Mars. Your base is awake!</div>
+      <div id="speech" class="speech" aria-live="polite">Nova: Hi Commander! Tap a part of our base, or use the cards!</div>
+      <div id="sceneCaption" class="scene-caption">Morning on Mars. Your base is awake! Tap the base parts — they work!</div>
     </div>
 
     <div class="gauges" aria-label="Base meters">
@@ -151,6 +152,15 @@
     <h2 id="phaseTitle" tabindex="-1">Sol 1 — Your turn, Commander!</h2>
     <p id="phaseHint" class="phase-hint">Tap cards to run your base. Watch your Power — you cannot do everything!</p>
     <noscript><p class="save-warn">This game needs JavaScript turned on. Ask a grown-up to enable it, then reload.</p></noscript>
+    <div id="dilemma" class="dilemma">
+      <h3>Daily Dilemma — pick ONE!</h3>
+      <p id="dilemmaQ">Loading dilemma…</p>
+      <div class="dilemma-btns">
+        <button id="dilemmaA" class="dilemma-btn"></button>
+        <button id="dilemmaB" class="dilemma-btn"></button>
+      </div>
+      <p id="dilemmaDone" class="dilemma-done hidden">Picked! You cannot have both — that is a real trade-off.</p>
+    </div>
     <div id="actions" class="actions"></div>
     <button id="nightBtn" class="big-btn night-btn">Start Night</button>
     <div id="eventCard" class="event-card hidden" role="alertdialog" aria-labelledby="eventTitle" aria-describedby="eventText eventFact">

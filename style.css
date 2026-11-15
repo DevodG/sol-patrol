@@ -36,6 +36,19 @@ button:focus-visible{outline:4px solid #3aa6c9;outline-offset:3px}
 .scene-svg .acting{animation:modPulse .9s ease}
 @keyframes modPulse{30%{filter:brightness(1.35) drop-shadow(0 0 10px #ffd23f)}}
 .save-warn{background:#fde8ec;border:3px solid var(--health);border-radius:12px;padding:9px 12px;font-weight:900}
+.speech{position:absolute;top:10px;left:12px;background:#fff;border:3px solid var(--ink);border-radius:14px;padding:7px 12px;font-weight:900;max-width:78%}
+.scene-svg g[role="button"]{cursor:pointer}
+.scene-svg g[role="button"]:hover{filter:brightness(1.12)}
+.scene-svg g[role="button"]:focus{outline:none;filter:brightness(1.2) drop-shadow(0 0 8px #ffd23f)}
+.dilemma{background:#fff3d6;border:3px solid var(--ink);border-radius:18px;padding:12px 14px;margin-bottom:12px}
+.dilemma h3{margin:0 0 4px;font-size:20px}
+.dilemma p{font-weight:800;margin:4px 0}
+.dilemma-btns{display:flex;gap:10px;flex-wrap:wrap}
+.dilemma-btn{flex:1;min-width:180px;background:#fff;border:3px solid var(--ink);border-radius:14px;padding:10px;font-weight:900;text-align:left}
+.dilemma-btn:hover:not(:disabled){background:#dff6ef}
+.dilemma-btn:disabled{opacity:.55}
+.dilemma-btn small{display:block;font-weight:800}
+.dilemma-done{color:#173a52}
 .night-shade{position:absolute;inset:0;background:rgba(20,28,64,.55)}
 .scene-caption{position:absolute;left:12px;bottom:12px;background:#fff;border:3px solid var(--ink);border-radius:14px;padding:7px 12px;font-weight:900;max-width:88%}
 .shield-dome.hidden{display:none}

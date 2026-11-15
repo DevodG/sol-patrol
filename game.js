@@ -25,6 +25,7 @@ const state = {
   shieldOn: false, used: new Set(), deck: [], tonight: null,
   solarTomorrow: null, grewToday: false, restedToday: false,
   over: false, sound: true, sunRisk: "active", started: false,
+  dilemmaIdx: 0, dilemmaDone: false,
 };
 
 const SAVE_KEY = "sol-patrol-save-v1";
@@ -36,6 +37,7 @@ function saveGame() {
       stars: state.stars, shieldOn: state.shieldOn, used: [...state.used],
       deck: state.deck.map((e) => e.id), tonight: state.tonight ? state.tonight.id : null,
       solarTomorrow: state.solarTomorrow, grewToday: state.grewToday, restedToday: state.restedToday, sunRisk: state.sunRisk,
+      dilemmaIdx: state.dilemmaIdx, dilemmaDone: state.dilemmaDone,
     }));
     $("saveWarn").classList.add("hidden");
   } catch (e) {
@@ -53,12 +55,14 @@ function restoreSave(s) {
     shieldOn: !!s.shieldOn, used: new Set(s.used || []), deck: (s.deck || []).map(byId).filter(Boolean),
     tonight: s.tonight ? byId(s.tonight) : null, solarTomorrow: s.solarTomorrow != null ? s.solarTomorrow : null,
     grewToday: !!s.grewToday, restedToday: !!s.restedToday, sunRisk: s.sunRisk || "active", over: false, started: true,
+    dilemmaIdx: s.dilemmaIdx || 0, dilemmaDone: !!s.dilemmaDone,
   });
+  showDilemma();
   if (!state.tonight) pickTonight(); else $("forecast").textContent = "Tonight: " + state.tonight.forecast;
   $("phaseTitle").textContent = `Sol ${state.sol} — Your turn, Commander!`;
   $("sceneCaption").textContent = `Welcome back, Commander! Sol ${state.sol} on Mars.`;
   $("nightShade").classList.add("hidden");
-  $("nightBtn").disabled = false;
+  $("nightBtn").disabled = !state.dilemmaDone;
   logMsg(`Mission restored at Sol ${state.sol}. Your crew waited for you!`);
   render();
 }
@@ -164,6 +168,68 @@ function doAction(a, btn) {
   render();
 }
 
+function say(text) { $("speech").textContent = text; }
+
+function crewSay() {
+  if (state.air <= 28) say("Nova: Commander, air is getting low! The Make Air machine is in our home dome — tap it!");
+  else if (state.food <= 24) say("Pip: My tummy is rumbling… tap the green garden dome to grow food!");
+  else if (state.health <= 40) say("Nova: We feel tired. Rest or Call Earth would help us a lot.");
+  else if (state.shieldOn) say("Pip: Shields up! I feel safe tonight, Commander.");
+  else say(state.sol % 2 ? "Nova: What is our plan today, Commander?" : "Pip: I love Mars! What should we run first?");
+}
+
+function showDilemma() {
+  const d = DILEMMAS[state.dilemmaIdx % DILEMMAS.length];
+  $("dilemmaQ").textContent = d.q;
+  $("dilemmaA").innerHTML = `${d.a.label}<small>${d.a.text}</small>`;
+  $("dilemmaB").innerHTML = `${d.b.label}<small>${d.b.text}</small>`;
+  $("dilemmaA").disabled = state.dilemmaDone || state.over;
+  $("dilemmaB").disabled = state.dilemmaDone || state.over;
+  $("dilemmaDone").classList.toggle("hidden", !state.dilemmaDone);
+  $("nightBtn").disabled = !state.dilemmaDone || state.over;
+  $("nightBtn").textContent = state.dilemmaDone ? "Start Night" : "Pick a Dilemma first, then Start Night";
+}
+
+function chooseDilemma(which) {
+  if (state.dilemmaDone || state.over) return;
+  const d = DILEMMAS[state.dilemmaIdx % DILEMMAS.length];
+  const pick = which === "a" ? d.a : d.b;
+  for (const [k, v] of Object.entries(pick.effects)) state[k] = clamp(state[k] + v);
+  state.dilemmaDone = true;
+  beep(700, 0.2);
+  say(`Great choice, Commander! ${pick.label}: ${pick.text}.`);
+  logMsg(`Dilemma picked: ${pick.label} (${pick.text}).`);
+  showDilemma();
+  render();
+}
+
+function wireScene() {
+  const map = { "mod-habitat": "air", "mod-green": "food", "mod-dish": "call", rover: "science", crew1: "rest", crew2: "rest", shieldDome: "shield" };
+  const names = { "mod-habitat": "Home dome — Make Air", "mod-green": "Garden dome — Grow Food", "mod-dish": "Dish — Call Earth", rover: "Rover — Do Science", crew1: "Crew — Rest and Fix", crew2: "Crew — Rest and Fix", shieldDome: "Shield — Raise Shields" };
+  for (const [id, actionId] of Object.entries(map)) {
+    const el = $(id);
+    if (!el) continue;
+    el.setAttribute("role", "button");
+    el.setAttribute("tabindex", "0");
+    el.setAttribute("aria-label", names[id]);
+    const go = () => {
+      const a = ACTIONS.find((x) => x.id === actionId);
+      const card = document.querySelector(`[data-id="${actionId}"]`);
+      if (a && card && !card.disabled) doAction(a, card);
+      else if (card && card.disabled) say("Nova: We cannot run that right now — check our Power!");
+    };
+    el.addEventListener("click", go);
+    el.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } });
+  }
+  const solar = $("mod-solar");
+  if (solar) {
+    solar.setAttribute("role", "button"); solar.setAttribute("tabindex", "0"); solar.setAttribute("aria-label", "Solar panels — sunshine power info");
+    const info = () => say(`Pip: Our solar panels made sunshine Power this morning. Power left: ${state.power}!`);
+    solar.addEventListener("click", info);
+    solar.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); info(); } });
+  }
+}
+
 function pickTonight() {
   if (!state.deck.length) state.deck = shuffled(EVENTS);
   state.tonight = state.deck.pop();
@@ -177,15 +243,18 @@ function morning() {
   state.power = clamp(banked + solar);
   state.used = new Set();
   state.shieldOn = false; state.grewToday = false; state.restedToday = false;
+  state.dilemmaIdx = state.sol - 1; state.dilemmaDone = false;
+  showDilemma();
   pickTonight();
   $("phaseTitle").textContent = `Sol ${state.sol} — Your turn, Commander!`;
   $("phaseHint").textContent = "Tap cards to run your base. Watch your Power — you cannot do everything!";
   $("sceneCaption").textContent = `Morning of Sol ${state.sol}. Sunshine made ${solar} Power!`;
   $("powerNote").textContent = `Solar panels made ${solar} Power. Leftover power saved: ${banked} (batteries hold only 5).`;
   $("nightShade").classList.add("hidden");
-  $("nightBtn").disabled = false;
+  $("nightBtn").disabled = !state.dilemmaDone;
   logMsg(`Sol ${state.sol} morning: +${solar} Power from sunshine.`);
   render();
+  crewSay();
 }
 
 function resolveNight() {
@@ -329,6 +398,9 @@ async function loadSunData() {
 
 function wire() {
   buildActions();
+  wireScene();
+  $("dilemmaA").addEventListener("click", () => chooseDilemma("a"));
+  $("dilemmaB").addEventListener("click", () => chooseDilemma("b"));
   const existing = readSave();
   if (existing) {
     $("startBtn").textContent = `Continue Sol ${existing.sol}`;
