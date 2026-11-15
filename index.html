@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SOL PATROL — Junior Astronaut Mission Trainer</title>
+<meta name="description" content="Run a Mars outpost for 8 sols. Balance air, food, power and shields. A NASA Space Apps 2026 game for kids 7-12.">
+<meta name="theme-color" content="#26324a">
+<meta property="og:type" content="website">
+<meta property="og:title" content="SOL PATROL — Junior Astronaut Mission Trainer">
+<meta property="og:description" content="Spend the sunshine. Survive the night. A Mars outpost game for ages 7-12, powered by live NASA DONKI space weather.">
+<meta property="og:image" content="assets/mars-outpost.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- TITLE SCREEN -->
+<div id="titleScreen" class="overlay" role="dialog" aria-modal="true" aria-labelledby="gameTitle">
+  <div class="title-card">
+    <p class="badge">NASA SPACE APPS 2026 · FOR AGES 7–12</p>
+    <h1 id="gameTitle">SOL PATROL</h1>
+    <p class="subtitle">Junior Astronaut Mission Trainer</p>
+    <p class="tagline">Spend the sunshine. Survive the night.</p>
+    <p class="tagline-sub">A sol is a Mars day, and the Sun is your battery. A Mars outpost game for ages 7–12, powered by live NASA DONKI space weather. Your crew: Nova and Pip.</p>
+    <img class="title-art" src="assets/mars-outpost.jpg" alt="Painting of a friendly Mars base with habitat dome, greenhouse, solar panels, rover and two astronauts" width="1120" height="747" fetchpriority="high">
+    <p class="pitch">You are the Commander of a Mars base. Keep your crew breathing, fed and safe for <strong>8 sols</strong> (Mars days). Every choice costs power — choose like a real NASA commander!</p>
+    <div class="title-rules">
+      <span>1. Spend sunshine power each day</span>
+      <span>2. Get ready for tonight</span>
+      <span>3. Survive 8 sols &amp; earn Science Stars</span>
+    </div>
+    <button id="startBtn" class="big-btn">Start Mission</button>
+    <button id="freshBtn" class="soft-btn hidden">New Mission</button>
+    <button id="howBtn" class="soft-btn">How to Play</button>
+    <p class="credit">Uses real NASA Sun data (DONKI) · Free · No download · No account</p>
+  </div>
+</div>
+
+<!-- HOW TO PLAY -->
+<div id="howModal" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="howTitle">
+  <div class="modal-card">
+    <h2 id="howTitle">How to Play</h2>
+    <ol class="how-list">
+      <li><strong>Morning:</strong> Sunshine gives you Power. Read the Sun News and tonight's forecast.</li>
+      <li><strong>Your turn:</strong> Tap mission cards to run your base. Each card costs Power. You cannot do everything — that is the real astronaut challenge!</li>
+      <li><strong>Night:</strong> Your crew breathes air and eats food. Tonight's event happens. Shields protect you from solar storms.</li>
+      <li><strong>Win:</strong> Keep Air, Food and Crew Health above zero for 8 sols. Earn Science Stars for a better rank!</li>
+    </ol>
+    <p class="word-bank"><strong>Word bank:</strong> <em>Sol</em> = one Mars day (24h 37m). <em>Radiation</em> = invisible energy from the Sun that can hurt people. <em>Shield</em> = protection that blocks radiation.</p>
+    <button class="big-btn close-how">Let's Go!</button>
+  </div>
+</div>
+
+<!-- SCIENCE NOTES -->
+<div id="scienceModal" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="sciTitle">
+  <div class="modal-card">
+    <h2 id="sciTitle">Real NASA Science in This Game</h2>
+    <ul class="sci-list">
+      <li><strong>Live Sun news — DONKI (NASA Open APIs, api.nasa.gov):</strong> the game asks NASA for real space-weather events (geomagnetic storms GST + solar energetic particles SEP) from the last 30 days. If the internet is off, it shows archived real events and says so. It never pretends old data is live.</li>
+      <li><strong>Radiation — RadLab / OSDR (NASA Open Science Data Repository):</strong> real space-station radiation is about 0.5 mSv a day, about 50 times your daily dose on Earth. That is why shields matter.</li>
+      <li><strong>Crew health — OSDR astronaut research:</strong> NASA studies sleep, bones and feelings in space. Rest and Call Earth cards come from that science.</li>
+      <li><strong>Mars place — Mars Trek &amp; Mars missions:</strong> our base sits in Jezero Plains, where NASA's Perseverance rover explores. Rover ice and dust events use real Mars facts.</li>
+      <li><strong>Food in space — CSA &amp; NASA Veggie:</strong> growing food uses water and air, just like the Grow Food card.</li>
+    </ul>
+    <p class="word-bank">Data links: <a href="https://api.nasa.gov" rel="noopener">api.nasa.gov</a> · <a href="https://science.nasa.gov" rel="noopener">science.nasa.gov (OSDR/RadLab)</a> · <a href="https://mars.nasa.gov" rel="noopener">mars.nasa.gov (Mars Trek)</a>. Game numbers are simplified for kids, facts are real.</p>
+    <button class="big-btn close-sci">Back to Mission</button>
+  </div>
+</div>
+
+<header class="topbar">
+  <div class="logo">SOL <span>PATROL</span></div>
+  <div class="top-stats">
+    <div class="pill" id="solPill">Sol 1 of 8</div>
+    <div class="pill stars-pill" id="starPill">Science Stars: 0</div>
+    <button id="soundBtn" class="icon-btn" aria-label="Turn sound on or off">Sound: ON</button>
+    <button id="scienceBtn" class="icon-btn">NASA Science</button>
+    <button id="helpBtn" class="icon-btn" aria-label="How to play">?</button>
+  </div>
+</header>
+
+<div id="sunBanner" class="sun-banner" role="status">
+  <span class="live-badge" id="liveBadge">CHECKING NASA…</span>
+  <span id="sunText">Asking NASA about the Sun…</span>
+</div>
+<p id="saveWarn" class="save-warn hidden" style="margin:10px 18px 0">Warning: this browser could not save your mission. Keep this tab open to keep playing!</p>
+
+<main class="layout">
+  <section class="scene-wrap" aria-label="Mars base">
+    <div id="scene" class="scene">
+      <svg viewBox="0 0 800 340" class="scene-svg" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Cartoon Mars base with habitat dome, greenhouse, solar panels, dish and rover">
+        <defs>
+          <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd9a0"/><stop offset="1" stop-color="#f28c5a"/></linearGradient>
+          <linearGradient id="domeG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#e3d5bd"/></linearGradient>
+          <linearGradient id="glassG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dff5e2" stop-opacity=".95"/><stop offset="1" stop-color="#8fce9f" stop-opacity=".8"/></linearGradient>
+        </defs>
+        <rect x="0" y="0" width="800" height="230" fill="url(#skyG)"/>
+        <circle cx="660" cy="52" r="30" fill="#ffedb5"/><circle cx="660" cy="52" r="44" fill="#ffe3a3" opacity=".45"/>
+        <path d="M0 210 L150 148 L300 205 L470 138 L640 200 L800 152 L800 340 L0 340Z" fill="#c65a2e"/>
+        <path d="M0 210 L150 148 L300 205 L470 138 L640 200 L800 152 L800 190 L640 225 L470 168 L300 232 L150 178 L0 238Z" fill="#d97742" opacity=".65"/>
+        <path d="M0 252 L220 215 L430 246 L620 220 L800 246 L800 340 L0 340Z" fill="#a8431f"/>
+        <g fill="#8f3418" opacity=".7"><circle cx="60" cy="300" r="7"/><circle cx="240" cy="322" r="5"/><circle cx="470" cy="308" r="8"/><circle cx="720" cy="318" r="6"/><circle cx="380" cy="282" r="4"/><circle cx="660" cy="278" r="5"/></g>
+        <path d="M120 292 Q320 268 520 288 T790 282" fill="none" stroke="#e8b07d" stroke-width="13" stroke-linecap="round" opacity=".8"/>
+        <g id="mod-habitat">
+          <ellipse cx="185" cy="272" rx="100" ry="12" fill="#7a2c12" opacity=".35"/>
+          <ellipse cx="185" cy="225" rx="95" ry="62" fill="url(#domeG)"/>
+          <path d="M95 225 a90 62 0 0 1 180 0" fill="url(#domeG)"/>
+          <ellipse cx="150" cy="188" rx="34" ry="16" fill="#fff" opacity=".75"/>
+          <circle cx="145" cy="205" r="13" fill="#8fd0e8" stroke="#26324a" stroke-width="3"/><circle cx="185" cy="195" r="15" fill="#ffd98a" stroke="#26324a" stroke-width="3"/><circle cx="225" cy="205" r="13" fill="#8fd0e8" stroke="#26324a" stroke-width="3"/>
+          <rect x="168" y="238" width="34" height="34" rx="14" fill="#e8ded0" stroke="#26324a" stroke-width="3"/>
+          <g fill="#ffb703"><circle cx="105" cy="248" r="4"/><circle cx="265" cy="248" r="4"/></g>
+        </g>
+        <g id="mod-green">
+          <ellipse cx="372" cy="268" rx="76" ry="9" fill="#7a2c12" opacity=".35"/>
+          <path d="M300 262 a72 58 0 0 1 144 0Z" fill="url(#glassG)" stroke="#dff5e2" stroke-width="3"/>
+          <path d="M322 262 v-28 M372 262 v-52 M422 262 v-28" stroke="#ffffff" stroke-width="3" opacity=".8"/>
+          <path d="M315 262 q16-40 38-20 q14-26 34-6 q20-24 34 2 q14-14 20 24" fill="#2f8f4e"/>
+          <path d="M330 256 q10-18 22-8 M392 252 q10-16 20-6" stroke="#57b96f" stroke-width="6" fill="none" stroke-linecap="round"/>
+        </g>
+        <g id="mod-solar" fill="#2b5ea7" stroke="#1d406e" stroke-width="2"><rect x="470" y="205" width="42" height="28" rx="3" transform="skewY(-4)"/><rect x="516" y="203" width="42" height="28" rx="3" transform="skewY(-4)"/><rect x="562" y="201" width="42" height="28" rx="3" transform="skewY(-4)"/><rect x="608" y="199" width="42" height="28" rx="3" transform="skewY(-4)"/></g>
+        <g id="mod-dish"><ellipse cx="690" cy="250" rx="22" ry="6" fill="#7a2c12" opacity=".35"/><circle cx="690" cy="213" r="19" fill="#fdf6ec" stroke="#26324a" stroke-width="3"/><circle cx="684" cy="207" r="6" fill="#8fd0e8"/><rect x="686" y="228" width="7" height="20" fill="#7a4a2b"/></g>
+        <g id="mod-crates"><rect x="452" y="252" width="26" height="22" rx="4" fill="#e9a13b" stroke="#9c5a12" stroke-width="2"/><rect x="482" y="258" width="20" height="16" rx="4" fill="#7fb069" stroke="#416d35" stroke-width="2"/></g>
+        <g id="rover"><ellipse cx="583" cy="306" rx="52" ry="8" fill="#7a2c12" opacity=".35"/><rect x="540" y="262" width="86" height="38" rx="16" fill="url(#domeG)" stroke="#26324a" stroke-width="3"/><circle cx="560" cy="302" r="11" fill="#4a4a5a"/><circle cx="590" cy="304" r="11" fill="#4a4a5a"/><circle cx="618" cy="302" r="11" fill="#4a4a5a"/><rect x="578" y="244" width="10" height="20" fill="#7a4a2b"/><circle cx="583" cy="240" r="9" fill="#8fd0e8" stroke="#26324a" stroke-width="2"/></g>
+        <g id="crew1"><ellipse cx="330" cy="326" rx="18" ry="5" fill="#7a2c12" opacity=".4"/><circle cx="330" cy="278" r="17" fill="#fff" stroke="#26324a" stroke-width="3"/><circle cx="330" cy="278" r="10" fill="#f2b879"/><rect x="314" y="294" width="32" height="30" rx="10" fill="#fff" stroke="#26324a" stroke-width="3"/><rect x="306" y="298" width="9" height="19" rx="4" fill="#e4572e"/><circle cx="330" cy="306" r="5" fill="#ffb703"/></g>
+        <g id="crew2"><ellipse cx="376" cy="328" rx="18" ry="5" fill="#7a2c12" opacity=".4"/><circle cx="376" cy="281" r="17" fill="#fff" stroke="#26324a" stroke-width="3"/><circle cx="376" cy="281" r="10" fill="#8a5a3b"/><rect x="360" y="297" width="32" height="30" rx="10" fill="#fff" stroke="#26324a" stroke-width="3"/><rect x="390" y="301" width="9" height="19" rx="4" fill="#2a9d8f"/><circle cx="376" cy="309" r="5" fill="#3aa6c9"/></g>
+        <g id="shieldDome" class="shield-dome hidden"><path d="M70 275 a300 190 0 0 1 600 0" fill="none" stroke="#57c7e3" stroke-width="5" stroke-dasharray="12 10" opacity="0.9"/></g>
+      </svg>
+      <div id="nightShade" class="night-shade hidden"></div>
+      <div id="sceneCaption" class="scene-caption">Morning on Mars. Your base is awake!</div>
+    </div>
+
+    <div class="gauges" aria-label="Base meters">
+      <div class="gauge power-gauge">
+        <div class="gauge-head"><span class="g-icon sun-icon"></span><span>Power (sunshine left)</span><strong id="powerVal">18</strong></div>
+        <div class="bar" role="progressbar" aria-label="Power sunshine left" aria-valuemin="0" aria-valuemax="100"><div id="powerBar" class="fill power-fill"></div></div>
+        <p class="gauge-note" id="powerNote">Solar panels made power this morning.</p>
+      </div>
+      <div class="gauge"><div class="gauge-head"><span class="g-icon air-icon"></span><span>Air to breathe</span><strong id="airVal">70</strong></div><div class="bar" role="progressbar" aria-label="Air to breathe" aria-valuemin="0" aria-valuemax="100"><div id="airBar" class="fill air-fill"></div></div><p class="gauge-note warn-note" id="airNote"></p></div>
+      <div class="gauge"><div class="gauge-head"><span class="g-icon food-icon"></span><span>Food to eat</span><strong id="foodVal">65</strong></div><div class="bar" role="progressbar" aria-label="Food to eat" aria-valuemin="0" aria-valuemax="100"><div id="foodBar" class="fill food-fill"></div></div><p class="gauge-note warn-note" id="foodNote"></p></div>
+      <div class="gauge"><div class="gauge-head"><span class="g-icon health-icon"></span><span>Crew health &amp; happiness</span><strong id="healthVal">85</strong></div><div class="bar" role="progressbar" aria-label="Crew health and happiness" aria-valuemin="0" aria-valuemax="100"><div id="healthBar" class="fill health-fill"></div></div></div>
+      <p id="shieldStatus" class="shield-status">Shield is OFF tonight. Solar storms can hurt the crew.</p>
+      <p id="forecast" class="forecast">Forecast: your mission has not started yet. Press Start Mission!</p>
+    </div>
+  </section>
+
+  <section class="play-wrap" aria-labelledby="phaseTitle">
+    <h2 id="phaseTitle" tabindex="-1">Sol 1 — Your turn, Commander!</h2>
+    <p id="phaseHint" class="phase-hint">Tap cards to run your base. Watch your Power — you cannot do everything!</p>
+    <noscript><p class="save-warn">This game needs JavaScript turned on. Ask a grown-up to enable it, then reload.</p></noscript>
+    <div id="actions" class="actions"></div>
+    <button id="nightBtn" class="big-btn night-btn">Start Night</button>
+    <div id="eventCard" class="event-card hidden" role="alertdialog" aria-labelledby="eventTitle" aria-describedby="eventText eventFact">
+      <h3 id="eventTitle">Event</h3>
+      <p id="eventText"></p>
+      <p id="eventFact" class="event-fact"></p>
+      <button id="eventBtn" class="big-btn">Continue</button>
+    </div>
+    <div id="log" class="log" aria-live="polite"></div>
+  </section>
+</main>
+
+<!-- END SCREEN -->
+<div id="endScreen" class="overlay hidden" role="dialog" aria-modal="true" aria-labelledby="endTitle">
+  <div class="title-card">
+    <h2 id="endTitle">Mission Complete!</h2>
+    <p id="endRank" class="end-rank"></p>
+    <p id="endMsg"></p>
+    <div id="endLessons" class="end-lessons"></div>
+    <button id="againBtn" class="big-btn">Play Again</button>
+    <p class="credit">Science sources: NASA DONKI · OSDR/RadLab · Mars Trek — see NASA Science notes in game.</p>
+  </div>
+</div>
+
+<footer class="footer">SOL PATROL · NASA Space Apps 2026 · Junior Astronaut Mission Trainer · Real Sun data: NASA DONKI via api.nasa.gov</footer>
+
+<script src="data.js"></script>
+<script src="game.js"></script>
+</body>
+</html>

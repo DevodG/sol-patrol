@@ -1,0 +1,7 @@
+{
+  "note": "Title art is an AI-generated concept painting, declared in README Submission notes (no NASA logos/marks in it). Gameplay scene is hand-built SVG in index.html so modules can glow, darken at night and show the shield dome with game state.",
+  "assets": [
+    { "id": "mars-outpost-painting", "file": "assets/mars-outpost.jpg", "draw": "title screen poster, full card width above the pitch" },
+    { "id": "scene-svg", "file": "index.html (inline SVG)", "draw": "full-width Mars scene behind play layer; shield dome overlay toggles with Raise Shields; modules pulse when their card fires" }
+  ]
+}

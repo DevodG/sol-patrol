@@ -1,0 +1,9 @@
+{
+  "name": "sol-patrol-junior-astronaut-trainer",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SOL PATROL — Junior Astronaut Mission Trainer. A Mars outpost trade-off game for kids 7-12. NASA Space Apps 2026.",
+  "scripts": {
+    "start": "python3 -m http.server 8765 --bind 127.0.0.1"
+  }
+}
